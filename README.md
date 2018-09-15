@@ -1,16 +1,16 @@
-#UTILC
+# UTILC
 
 Library of useful tools in C
 
-##Install
+## Install
 
 Clone the git repository
-*make
+Go in the directory you just clone and  : make
 
-##Include
+## Include
 
 #include <utils/xxx.h> where xxx is the header you need.
 
-##Linking
+## Linking
 
 Add the flag -lutilc
