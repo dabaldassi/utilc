@@ -4,10 +4,10 @@ BUILD_DIR=build/
 SRC=$(notdir $(wildcard $(SRC_DIR)*.c))
 OBJ=$(addprefix $(BUILD_DIR), $(SRC:.c=.o))
 H=$(wildcard $(SRC_DIR)*.h)
-CFLAGS=-fPIC -O2 -Wall -Wextra -ansi
+CFLAGS=-g -O0 -Wall -Wextra -ansi
 LIBS=
 
-all:testBuild lib
+all:testBuild $(EXEC)
 testBuild:
 	@if [ -d $(BUILD_DIR) ];	then	echo;else mkdir $(BUILD_DIR);	fi;
 $(EXEC):$(OBJ)

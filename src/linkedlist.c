@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdarg.h>
 #include "linkedlist.h"
 
 static ElementLL * getElement_LL(LinkedList *l, int ind)
@@ -27,7 +28,7 @@ LinkedList * create_LL()
   LinkedList * l = NULL;
   ALLOC(l,LinkedList,1,"Failed to create LinkedList\n")
   else {
-    l->first = NULL;	 
+    l->first = NULL;
     l->size = 0;
     l->next = NULL;
   }
@@ -140,14 +141,14 @@ void * getValue_LL(LinkedList *l, int ind)
   void * value = NULL;
 
   if (l == NULL) {
-    fprintf(stderr, "List doesn't exist, you can't get a value");
+    fprintf(stderr, "LinkedList doesn't exist, you can't get a value");
   }
   else {
     
     elt = getElement_LL(l,ind);
 
     if(elt == NULL)
-      fprintf(stderr, "List out of range \n");
+      fprintf(stderr, "LinkedList out of range \n");
     else
       value = elt->value;
   }
@@ -159,51 +160,45 @@ int add_LL(LinkedList * l, int ind, void * value)
 {
   ElementLL * new = NULL;
   ElementLL * elt = NULL;
-  int ret = 1; /* return value */
-  int i;
+  int         ret = 1; /* return value */
 
+  if(ind > l->size) ind = l->size;
+
+  printf("ind = %d\n", ind);
+  
   if(l == NULL)
     {
-      fprintf(stderr, "Add failed :  list doesn't exist \n");
+      fprintf(stderr, "Add failed :  Linkedlist doesn't exist \n");
     }
-  else {
+  else
+    {
+      new = (ElementLL *) malloc(sizeof(ElementLL));
 
-    new = (ElementLL *) malloc(sizeof(ElementLL));
-
-    if(new == NULL)
-      {
-	fprintf(stderr, "Failed to create new element \n");
-      }
-    else {
-      new->value = value;
-
-      elt = l->first;
-
-      if(elt == NULL || ind == 0)
+      if(new == NULL)
 	{
-	  new->next = l->first;
-	  l->first = new;
-	  --ret;
-	  ++(l->size);
+	  fprintf(stderr, "Failed to create new element in linkedlist\n");
 	}
-
       else
 	{
-	  i = 0;
-	  while(elt->next != NULL &&  i < ind-1)
+	  new->value = value;
+
+	  if(ind == 0)
 	    {
-	      elt = elt->next;
-	      i++;
+	      new->next = l->first;
+	      l->first = new;
+	    }
+	  else
+	    {
+	      elt = getElement_LL(l, ind - 1);
+
+	      new->next = elt->next;
+	      elt->next = new;
 	    }
 
-	  new->next = elt->next;
-	  elt->next = new;
 	  ++(l->size);
-	  --ret;
+	  ret = 0;
 	}
     }
-  }
-  
 
   return ret;
       
@@ -215,7 +210,7 @@ void delElement_LL(LinkedList * l, int ind, void (* freeElement)(void *))
   
   if(l == NULL)
     {
-      fprintf(stderr, "List doesn't exist, you can't delete an element \n");
+      fprintf(stderr, "LinkedList doesn't exist, you can't delete an element \n");
     }
   else if(l->size > 0)
     {
@@ -247,18 +242,32 @@ void delElement_LL(LinkedList * l, int ind, void (* freeElement)(void *))
 	      del = NULL;
 	      l->size -= 1;
 	    }
+	  else
+	    {
+	      ERROR("Can't delete element from linked list\n");
+	    }
 	}
     }  
 }
 
 
-int set_LL(LinkedList * l, int ind, void * value)
+int set_LL(LinkedList * l, int ind, void * value, void (*freeElement)(void *))
 {
-  int ret = 1;
+  int         ret = 1;
+  ElementLL * e;
+  
   if(l)
     {
-      getElement_LL(l,ind)->value = value;
-      --ret;
+      e = getElement_LL(l,ind);
+
+      if(e)
+	{
+	  if(freeElement) freeElement(e->value);
+
+	  e->value = value;
+      
+	  --ret;
+	}
     }
   else {
     ERROR("Can't set value !\n");
@@ -284,3 +293,35 @@ void * nextIterator_LL(LinkedList * l)
 
   return e;
 }
+
+void map_LL(LinkedList * l, void * (*fn)(void *))
+{
+  ElementLL * elt = l->first;
+
+  while(elt)
+    {
+      elt->value = fn(elt->value);
+      /*printf("%d\n", *(int *)elt->value);*/
+      elt = elt->next;
+    }
+}
+
+void map_if_LL(LinkedList * l, void * (*fn)(void *), int (*eq)(void *))
+{
+  ElementLL * elt = l->first;
+
+  while(elt)
+    {
+      if(eq(elt->value))
+	elt->value = fn(elt->value);
+
+      elt = elt->next;
+    }
+}
+
+/*
+void map(LinkedList * l, void (*fn)(), ...)
+{
+  fn(5,6,7);
+}
+*/

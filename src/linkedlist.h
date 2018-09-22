@@ -38,16 +38,17 @@ typedef struct LinkedList
  */
 LinkedList * create_LL();
 
-void delByElement_LL(LinkedList * l, void * value, int (*eq)(void *, void *), void (* freeElement)(void *));
-void delete_LL(LinkedList * l, void (* freeElement)(void *));
-
+void   delByElement_LL(LinkedList * l, void * value, int (*eq)(void *, void *), void (* freeElement)(void *));
+void   delete_LL(LinkedList * l, void (* freeElement)(void *));
 int    size_LL(LinkedList * l);
 void * getValue_LL(LinkedList *l, int ind);
 int    add_LL(LinkedList * l, int ind, void * value);
 void   delElement_LL(LinkedList * l, int ind, void (* freeElement)(void *));
-int    set_LL(LinkedList * l, int ind, void * value);
+int    set_LL(LinkedList * l, int ind, void * value, void (*freeElement)(void *));
 void * contains_LL(LinkedList * l, void * elt, int (*egal)(void *, void *));
 void * nextIterator_LL(LinkedList * l);
 void   initIterator_LL(LinkedList * l);
+void   map_LL(LinkedList * l, void * (*fn)(void *));
+void   map_if_LL(LinkedList * l, void * (*fn)(void *), int (*eq)(void *));
 
 #endif /* LINKEDLIST_H */
